@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace TaeKimReader
+﻿namespace TaeKimReader
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Vocabulary wordDictionary = new(args[0]);
         }
     }
 }
