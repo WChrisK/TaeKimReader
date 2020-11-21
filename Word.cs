@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace TaeKimReader
@@ -87,6 +88,21 @@ namespace TaeKimReader
             return match.Success ? match.Value : null;
         }
 
-        public override string ToString() => Extra != null ? $"{Text} ({Extra}) = {Translation}" : $"{Text} = {Translation}";
+        public override string ToString()
+        {
+            StringBuilder output = new();
+            output.Append(Text);
+
+            string hiragana = string.Join("", Elements.Select(e => e.Ruby ?? e.Text));
+            if (Text != hiragana)
+                output.Append($" [{hiragana}]");
+
+            if (Extra != null)
+                output.Append($" ({Extra})");
+
+            output.Append($" = {Translation}");
+
+            return output.ToString();
+        }
     }
 }

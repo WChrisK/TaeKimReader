@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace TaeKimReader
 {
-    public class Vocabulary : IEnumerable<KeyValuePair<string, Word>>
+    public class Vocabulary
     {
         private static readonly Regex WordRegex = new(@"\d+\. (.+)- (.+)", RegexOptions.Compiled);
 
@@ -28,6 +30,11 @@ namespace TaeKimReader
                 else
                     HandleWord(line);
             }
+        }
+
+        public bool TryGetValue(string kana, [MaybeNullWhen(false)] out Word? word)
+        {
+            return dictionary.TryGetValue(kana, out word);
         }
 
         private void HandleChapter(string line)
@@ -52,8 +59,22 @@ namespace TaeKimReader
                 dictionary.Add(word.Text, word);
         }
 
-        public IEnumerator<KeyValuePair<string, Word>> GetEnumerator() => dictionary.GetEnumerator();
+        public IEnumerable<(Version, ReadOnlyCollection<Word>)> GetSortedVersionDictionary()
+        {
+            return chapterToWords.Select(pair => (pair.Key, pair.Value.AsReadOnly()))
+                                 .OrderBy(t => t.Key)
+                                 .ToList();
+        }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public void WriteToFile(string path)
+        {
+            using StreamWriter w = new(File.OpenWrite(path));
+            foreach (var (version, words) in GetSortedVersionDictionary())
+            {
+                w.WriteLine(version);
+                foreach (Word word in words)
+                    w.WriteLine($"    {word}");
+            }
+        }
     }
 }
