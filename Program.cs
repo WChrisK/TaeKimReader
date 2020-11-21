@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-
-namespace TaeKimReader
+﻿namespace TaeKimReader
 {
     public static class Program
     {
@@ -9,9 +6,6 @@ namespace TaeKimReader
         {
             Vocabulary wordDictionary = new(args[0]);
             Sentences sentences = new(args[1], wordDictionary);
-
-            wordDictionary.WriteToFile(@"D:\z_vocab.txt");
-            sentences.WriteToFile(@"D:\z_sentence.txt");
         }
     }
 }
