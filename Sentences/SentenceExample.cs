@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace TaeKimReader
+namespace TaeKimReader.Sentences
 {
     public class SentenceExample : IEnumerable<Sentence>
     {

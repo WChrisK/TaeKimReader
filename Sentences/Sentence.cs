@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using TaeKimReader.Words;
 
-namespace TaeKimReader
+namespace TaeKimReader.Sentences
 {
     public class Sentence
     {

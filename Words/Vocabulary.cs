@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TaeKimReader
+namespace TaeKimReader.Words
 {
     public class Vocabulary
     {
@@ -40,6 +40,9 @@ namespace TaeKimReader
         private void HandleChapter(string line)
         {
             Version version = new(line[1..^1]);
+            if (chapterToWords.ContainsKey(version))
+                throw new Exception($"Trying to add chapter {version} twice");
+
             currentChapterList = new List<Word>();
             chapterToWords[version] = currentChapterList;
         }
@@ -53,22 +56,26 @@ namespace TaeKimReader
             string wordAndInfo = match.Groups[1].Value.Trim();
             string translation = match.Groups[2].Value.Trim();
             Word word = new(wordAndInfo, translation);
-            currentChapterList.Add(word);
 
+            // Only add it if we've never seen it before.
             if (!dictionary.ContainsKey(word.Text))
+            {
+                currentChapterList.Add(word);
                 dictionary.Add(word.Text, word);
+            }
         }
 
         public IEnumerable<(Version, ReadOnlyCollection<Word>)> GetSortedVersionDictionary()
         {
-            return chapterToWords.Select(pair => (pair.Key, pair.Value.AsReadOnly()))
+            return chapterToWords.Where(pair => pair.Value.Count > 0)
+                                 .Select(pair => (pair.Key, pair.Value.AsReadOnly()))
                                  .OrderBy(t => t.Key)
                                  .ToList();
         }
 
         public void WriteToFile(string path)
         {
-            using StreamWriter w = new(File.OpenWrite(path));
+            using StreamWriter w = new(File.OpenWrite(path), Encoding.UTF8);
             foreach (var (version, words) in GetSortedVersionDictionary())
             {
                 w.WriteLine(version);

@@ -4,16 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TaeKimReader
+namespace TaeKimReader.Words
 {
     public class Word
     {
-        private static readonly Regex WordExtraInfo = new(@"(\\(\w+(-\w+)?\\))", RegexOptions.Compiled);
+        private static readonly Regex WordExtraInfo = new(@"\((\w+(-\w+)?)\)", RegexOptions.Compiled);
 
         public IReadOnlyList<WordElement> Elements { get; }
         public string? Extra { get; }
         public string Translation { get; }
         public string Text { get; }
+
+        public bool HasKanji => Elements.Any(e => e.IsKanji);
 
         public Word(string wordAndInfo, string translation)
         {
@@ -85,7 +87,7 @@ namespace TaeKimReader
         private static string? ReadExtra(string wordAndInfo)
         {
             Match match = WordExtraInfo.Match(wordAndInfo);
-            return match.Success ? match.Value : null;
+            return match.Success ? match.Groups[1].Value : null;
         }
 
         public override string ToString()

@@ -6,10 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using TaeKimReader.Words;
 
-namespace TaeKimReader
+namespace TaeKimReader.Sentences
 {
-    public class Sentences
+    public class SentenceExamples
     {
         private static readonly Regex EnglishSentenceRegex = new("^[-A-Za-z.]", RegexOptions.Compiled);
 
@@ -19,7 +20,7 @@ namespace TaeKimReader
         private SentenceExampleBuilder sentenceBuilder = new();
         private List<WordElement> lastKanaSentence = new(new List<WordElement>());
 
-        public Sentences(string path, Vocabulary vocab)
+        public SentenceExamples(string path, Vocabulary vocab)
         {
             vocabulary = vocab;
 
@@ -63,7 +64,7 @@ namespace TaeKimReader
         {
             if (EnglishSentenceRegex.IsMatch(line))
             {
-                Sentence sentence = new (lastKanaSentence, line);
+                Sentence sentence = new(lastKanaSentence, line);
                 sentenceBuilder.Add(sentence);
             }
             else
@@ -134,7 +135,7 @@ namespace TaeKimReader
 
         public void WriteToFile(string path)
         {
-            using StreamWriter w = new(File.OpenWrite(path));
+            using StreamWriter w = new(File.OpenWrite(path), Encoding.UTF8);
             foreach (var (version, sentenceExamples) in GetSortedVersionDictionary())
             {
                 w.WriteLine(version);
